@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f3eb">
+<title>The shape of nearness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: #f7f3eb;
+    color: #1a1612;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    padding-top: max(20px, env(safe-area-inset-top));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  header { padding: 8px 0 24px; }
+  .kicker {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: #998f85;
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(34px, 9vw, 56px);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    margin: 0 0 18px;
+    color: #1a1612;
+    font-variation-settings: "opsz" 144, "SOFT" 50;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 300;
+    color: #7f77dd;
+  }
+  .intro {
+    font-size: 17px;
+    line-height: 1.55;
+    color: #4a4239;
+    margin: 0 0 4px;
+    max-width: 540px;
+  }
+  .intro + .intro { margin-top: 12px; }
+
+  .viz {
+    margin: 32px 0 24px;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    flex-wrap: wrap;
+  }
+  .topbar-label {
+    color: #6b6259;
+    font-size: 13px;
+  }
+  .gauge {
+    flex: 1;
+    min-width: 80px;
+    height: 6px;
+    background: rgba(0,0,0,0.06);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .gauge-fill {
+    height: 100%;
+    background: #7f77dd;
+    width: 50%;
+    transition: width .15s, background .3s;
+  }
+  .val {
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+    min-width: 36px;
+    text-align: right;
+    font-size: 13px;
+  }
+  .badge {
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.05);
+    color: #6b6259;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: all .25s;
+    white-space: nowrap;
+  }
+  .reset {
+    font-size: 12px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: 0.5px solid rgba(0,0,0,0.18);
+    background: transparent;
+    color: #1a1612;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .reset:active { background: rgba(0,0,0,0.06); }
+
+  .canvas-wrap {
+    width: 100%;
+    height: clamp(340px, 78vw, 540px);
+    border-radius: 14px;
+    background: #ebe5d6;
+    overflow: hidden;
+    position: relative;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: none;
+  }
+  canvas:active { cursor: grabbing; }
+
+  .legend {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+    font-size: 12px;
+  }
+  .li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 10px;
+    background: #ffffff;
+    border: 0.5px solid rgba(0,0,0,0.1);
+    border-radius: 999px;
+    color: #4a4239;
+  }
+  .sw {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .explain {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 0.5px solid rgba(0,0,0,0.1);
+  }
+  .explain p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #4a4239;
+    margin: 0 0 14px;
+    max-width: 540px;
+  }
+  .explain em {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    color: #1a1612;
+  }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 0.5px solid rgba(0,0,0,0.08);
+    font-size: 13px;
+    color: #998f85;
+    text-align: center;
+    padding-bottom: 24px;
+  }
+  footer em {
+    font-family: "Fraunces", Georgia, serif;
+    font-style: italic;
+  }
+
+  @media (max-width: 480px) {
+    main { padding: 0 18px; }
+    .intro { font-size: 16px; }
+    .explain p { font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="kicker">an interactive piece</p>
+    <h1>The shape of <em>nearness</em></h1>
+    <p class="intro">A graph normally draws people as identical dots and connections as identical lines. But real people aren't identical &mdash; and neither is what happens to you when one of them gets close.</p>
+    <p class="intro">Drag the circles. Watch what happens.</p>
+  </header>
+
+  <section class="viz" aria-label="Interactive social graph">
+    <div class="topbar">
+      <span class="topbar-label">Your energy</span>
+      <div class="gauge"><div class="gauge-fill" id="gauge"></div></div>
+      <span class="val" id="energy-val">1.00</span>
+      <span class="badge" id="state-badge">baseline</span>
+      <button class="reset" id="reset" type="button">Reset</button>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="graph" aria-label="Drag the labeled circles to see how proximity changes each person's energy and the intensity of their connections."></canvas>
+    </div>
+
+    <div class="legend" aria-label="Legend">
+      <span class="li"><span class="sw" style="background:#7f77dd"></span>You</span>
+      <span class="li"><span class="sw" style="background:#e8973a"></span>Maya &middot; best friend</span>
+      <span class="li"><span class="sw" style="background:#378add"></span>Jordan &middot; best friend</span>
+      <span class="li"><span class="sw" style="background:#d4537e"></span>Sam &middot; partner</span>
+      <span class="li"><span class="sw" style="background:#63991f"></span>Dad &middot; family</span>
+      <span class="li"><span class="sw" style="background:#888780"></span>Riley &middot; coworker</span>
+      <span class="li"><span class="sw" style="background:#e24b4a"></span>Alex &middot; draining</span>
+    </div>
+  </section>
+
+  <section class="explain">
+    <p>Pull Maya and Jordan close to <em>You</em> at the same time. Both bonds glow more than either alone &mdash; that's the part most graphs leave out. Being around two people you love isn't twice as good as being around one. It's <em>more</em> than twice.</p>
+    <p>Now pull Alex in. You dim. Some closeness costs you.</p>
+    <p>The patterns inside each circle are personality, fixed. The size, the brightness, the thickness of the lines &mdash; those move with the company you keep.</p>
+  </section>
+
+  <footer>
+    <p><em>made with claude</em> &middot; share freely</p>
+  </footer>
+</main>
+
+<script>
+(function() {
+  const canvas = document.getElementById('graph');
+  const ctx = canvas.getContext('2d');
+  const gaugeEl = document.getElementById('gauge');
+  const energyValEl = document.getElementById('energy-val');
+  const badgeEl = document.getElementById('state-badge');
+  const resetBtn = document.getElementById('reset');
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 680, H = 460;
+  let scale = 1;
+
+  function fitCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    scale = Math.min(W, H) / 460;
+    placeNodes();
+  }
+
+  const nodes = [
+    { id: 'you',    name: 'You',    baseR: 26, color: '#7f77dd', aura: '#a78bfa', texture: 'core' },
+    { id: 'maya',   name: 'Maya',   baseR: 22, color: '#e8973a', aura: '#fbbf24', texture: 'warm' },
+    { id: 'jordan', name: 'Jordan', baseR: 22, color: '#378add', aura: '#60a5fa', texture: 'cool' },
+    { id: 'sam',    name: 'Sam',    baseR: 23, color: '#d4537e', aura: '#f472b6', texture: 'soft' },
+    { id: 'dad',    name: 'Dad',    baseR: 21, color: '#63991f', aura: '#84cc16', texture: 'steady' },
+    { id: 'riley',  name: 'Riley',  baseR: 17, color: '#888780', aura: '#cbd5e1', texture: 'flat' },
+    { id: 'alex',   name: 'Alex',   baseR: 20, color: '#e24b4a', aura: '#7f1d1d', texture: 'jagged' },
+  ];
+  const byId = {};
+  nodes.forEach(n => { byId[n.id] = n; n.energy = 1; n.targetEnergy = 1; n.posActive = 0; });
+
+  function initialOffsets() {
+    return {
+      you:    [   0,    0],
+      maya:   [-200, -110],
+      jordan: [ 200, -110],
+      sam:    [   0, -175],
+      dad:    [-215,   95],
+      riley:  [ 215,   95],
+      alex:   [  35,  165],
+    };
+  }
+
+  function placeNodes() {
+    const cx = W / 2, cy = H / 2;
+    const offsets = initialOffsets();
+    nodes.forEach(n => {
+      const [ox, oy] = offsets[n.id];
+      n.x = cx + ox * scale;
+      n.y = cy + oy * scale;
+    });
+  }
+
+  const edges = [
+    { from: 'you', to: 'maya',    strength:  1.0, baseW: 5,   color: '#e8973a', kind: 'best-friend' },
+    { from: 'you', to: 'jordan',  strength:  1.0, baseW: 5,   color: '#378add', kind: 'best-friend' },
+    { from: 'you', to: 'sam',     strength:  1.2, baseW: 6,   color: '#d4537e', kind: 'partner' },
+    { from: 'you', to: 'dad',     strength:  0.7, baseW: 4,   color: '#63991f', kind: 'family' },
+    { from: 'you', to: 'riley',   strength:  0.3, baseW: 2,   color: '#888780', kind: 'coworker' },
+    { from: 'you', to: 'alex',    strength: -0.9, baseW: 3,   color: '#e24b4a', kind: 'draining', dashed: true },
+    { from: 'maya', to: 'jordan', strength:  0.4, baseW: 2,   color: '#a78bfa', kind: 'friends' },
+  ];
+
+  function tick() {
+    const OPTIMAL = 165 * scale;
+    const FALLOFF = 230 * scale;
+
+    for (const e of edges) {
+      const a = byId[e.from], b = byId[e.to];
+      const dx = a.x - b.x, dy = a.y - b.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      const excess = Math.max(0, d - OPTIMAL);
+      e.activation = Math.max(0, 1 - excess / FALLOFF);
+    }
+
+    for (const n of nodes) {
+      let pos = 0, neg = 0, posActive = 0;
+      for (const e of edges) {
+        if (e.from !== n.id && e.to !== n.id) continue;
+        const c = e.activation * e.strength;
+        if (e.strength > 0) { pos += c; if (e.activation > 0.4) posActive++; }
+        else neg += c;
+      }
+      if (posActive >= 2) pos *= 1 + 0.4 * (posActive - 1);
+      n.posActive = posActive;
+      n.targetEnergy = Math.max(0.45, Math.min(2.3, 1 + pos * 0.55 + neg * 0.7));
+      n.energy += (n.targetEnergy - n.energy) * 0.13;
+    }
+
+    const you = byId.you;
+    for (const e of edges) {
+      e.synergyBoost = 0;
+      if ((e.from === 'you' || e.to === 'you') && e.strength > 0 && you.posActive >= 2 && e.activation > 0.4) {
+        e.synergyBoost = 0.35 * (you.posActive - 1);
+      }
+    }
+  }
+
+  function hexA(hex, alpha) {
+    return hex + Math.floor(Math.min(1, Math.max(0, alpha)) * 255).toString(16).padStart(2, '0');
+  }
+
+  function drawTexture(n, r) {
+    const { x, y, texture } = n;
+    ctx.save();
+    if (texture === 'core') {
+      const grd = ctx.createRadialGradient(x - r*0.3, y - r*0.3, r*0.05, x, y, r);
+      grd.addColorStop(0, 'rgba(255,255,255,0.55)');
+      grd.addColorStop(0.6, 'rgba(255,255,255,0)');
+      ctx.fillStyle = grd;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+    } else if (texture === 'warm') {
+      ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+      ctx.lineWidth = 1.2;
+      for (let i = 0; i < 8; i++) {
+        const a = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(x + Math.cos(a) * r * 0.32, y + Math.sin(a) * r * 0.32);
+        ctx.lineTo(x + Math.cos(a) * r * 0.75, y + Math.sin(a) * r * 0.75);
+        ctx.stroke();
+      }
+    } else if (texture === 'cool') {
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.arc(x, y, r * 0.45, 0, Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(x, y, r * 0.72, 0, Math.PI*2); ctx.stroke();
+    } else if (texture === 'soft') {
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 - Math.PI/2;
+        ctx.beginPath();
+        ctx.arc(x + Math.cos(a) * r * 0.5, y + Math.sin(a) * r * 0.5, 1.8, 0, Math.PI*2);
+        ctx.fill();
+      }
+      ctx.beginPath(); ctx.arc(x, y, 1.8, 0, Math.PI*2); ctx.fill();
+    } else if (texture === 'steady') {
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1.1;
+      for (let i = -2; i <= 2; i++) {
+        const yy = y + i * r * 0.28;
+        const half = Math.sqrt(Math.max(0, r*r - (i*r*0.28)*(i*r*0.28))) * 0.82;
+        if (half > 2) { ctx.beginPath(); ctx.moveTo(x - half, yy); ctx.lineTo(x + half, yy); ctx.stroke(); }
+      }
+    } else if (texture === 'flat') {
+      // intentionally minimal
+    } else if (texture === 'jagged') {
+      ctx.strokeStyle = 'rgba(0,0,0,0.4)';
+      ctx.lineWidth = 1.6;
+      const j = r * 0.55;
+      ctx.beginPath();
+      ctx.moveTo(x-j, y-j*0.6); ctx.lineTo(x-j*0.1, y+j*0.3); ctx.lineTo(x+j*0.6, y-j*0.4); ctx.lineTo(x+j, y+j*0.6);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  let t = 0;
+  function draw() {
+    t += 1/60;
+    ctx.clearRect(0, 0, W, H);
+
+    // Edges
+    for (const e of edges) {
+      const a = byId[e.from], b = byId[e.to];
+      const act = e.activation;
+      const isNeg = e.strength < 0;
+      const syn = e.synergyBoost || 0;
+      const bw = e.baseW * Math.max(0.85, scale * 0.9);
+
+      if (!isNeg && act > 0.1) {
+        const haloAlpha = act * (0.18 + syn * 0.35);
+        ctx.strokeStyle = hexA(e.color, haloAlpha);
+        ctx.lineWidth = bw * (1 + act * 2 + syn * 1.5) * 2.6;
+        ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      }
+
+      const mainAlpha = isNeg ? 0.5 + act * 0.4 : 0.32 + act * 0.55 + syn * 0.15;
+      ctx.strokeStyle = hexA(e.color, Math.min(1, mainAlpha));
+      ctx.lineWidth = bw * (0.55 + act * 1.4 + syn * 1.2);
+      ctx.lineCap = 'round';
+      if (e.dashed) {
+        const dashPhase = (t * 14) % 11;
+        ctx.setLineDash([6, 5]);
+        ctx.lineDashOffset = -dashPhase;
+      }
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.lineDashOffset = 0;
+    }
+
+    // Nodes
+    for (const n of nodes) {
+      const r = n.baseR * scale * (0.7 + n.energy * 0.42);
+
+      const auraStrength = Math.max(0, n.energy - 0.85);
+      if (auraStrength > 0.02) {
+        const pulse = n.posActive >= 2 ? (1 + Math.sin(t * 3.5) * 0.06) : 1;
+        const auraR = r * (1.8 + auraStrength * 2.4) * pulse;
+        const auraAlpha = Math.min(0.55, auraStrength * 0.7);
+        const grd = ctx.createRadialGradient(n.x, n.y, r * 0.7, n.x, n.y, auraR);
+        grd.addColorStop(0, hexA(n.aura, auraAlpha));
+        grd.addColorStop(0.5, hexA(n.aura, auraAlpha * 0.35));
+        grd.addColorStop(1, hexA(n.aura, 0));
+        ctx.fillStyle = grd;
+        ctx.beginPath(); ctx.arc(n.x, n.y, auraR, 0, Math.PI*2); ctx.fill();
+      }
+
+      if (n.energy < 0.9) {
+        const dimR = r * 1.6;
+        const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, dimR);
+        const dimA = (0.9 - n.energy) * 0.4;
+        grd.addColorStop(0, hexA('#1a1a1a', dimA));
+        grd.addColorStop(1, hexA('#1a1a1a', 0));
+        ctx.fillStyle = grd;
+        ctx.beginPath(); ctx.arc(n.x, n.y, dimR, 0, Math.PI*2); ctx.fill();
+      }
+
+      const opacity = 0.55 + Math.min(0.45, Math.max(0, (n.energy - 0.55) * 0.55));
+      ctx.fillStyle = hexA(n.color, opacity);
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2); ctx.fill();
+
+      drawTexture(n, r);
+
+      ctx.strokeStyle = hexA('#ffffff', 0.65);
+      ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2); ctx.stroke();
+
+      ctx.fillStyle = 'rgba(26,22,18,0.85)';
+      ctx.font = '500 ' + Math.max(11, Math.round(12 * scale)) + 'px -apple-system, system-ui, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(n.name, n.x, n.y + r + 6);
+    }
+
+    const you = byId.you;
+    const pct = Math.min(100, Math.max(0, (you.energy - 0.4) / 1.8 * 100));
+    gaugeEl.style.width = pct + '%';
+    energyValEl.textContent = you.energy.toFixed(2);
+
+    if (you.energy < 0.85) {
+      gaugeEl.style.background = '#e24b4a';
+      badgeEl.style.background = '#fee2e2';
+      badgeEl.style.color = '#991b1b';
+      badgeEl.textContent = 'drained';
+    } else if (you.posActive >= 2) {
+      gaugeEl.style.background = '#a78bfa';
+      badgeEl.style.background = '#ede9fe';
+      badgeEl.style.color = '#5b21b6';
+      badgeEl.textContent = 'synergy · ' + you.posActive + ' bonds';
+    } else if (you.energy > 1.1) {
+      gaugeEl.style.background = '#7f77dd';
+      badgeEl.style.background = '#f3f0ff';
+      badgeEl.style.color = '#5b21b6';
+      badgeEl.textContent = 'lifted';
+    } else {
+      gaugeEl.style.background = '#7f77dd';
+      badgeEl.style.background = 'rgba(0,0,0,0.05)';
+      badgeEl.style.color = '#6b6259';
+      badgeEl.textContent = 'baseline';
+    }
+  }
+
+  let dragNode = null;
+  function nodeAt(x, y) {
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const n = nodes[i];
+      const r = n.baseR * scale * (0.7 + n.energy * 0.42);
+      const hit = Math.max(r + 12, 22); // generous hit area for fingers
+      const dx = n.x - x, dy = n.y - y;
+      if (dx*dx + dy*dy <= hit * hit) return n;
+    }
+    return null;
+  }
+  function getXY(e) {
+    const rect = canvas.getBoundingClientRect();
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  }
+  canvas.addEventListener('pointerdown', (e) => {
+    const { x, y } = getXY(e);
+    dragNode = nodeAt(x, y);
+    if (dragNode) {
+      canvas.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    }
+  });
+  canvas.addEventListener('pointermove', (e) => {
+    if (!dragNode) return;
+    const { x, y } = getXY(e);
+    dragNode.x = Math.max(20, Math.min(W - 20, x));
+    dragNode.y = Math.max(20, Math.min(H - 20, y));
+  });
+  canvas.addEventListener('pointerup', () => { dragNode = null; });
+  canvas.addEventListener('pointercancel', () => { dragNode = null; });
+
+  resetBtn.addEventListener('click', () => { placeNodes(); });
+
+  let resizeTimeout;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(fitCanvas, 100);
+  });
+  window.addEventListener('orientationchange', () => {
+    setTimeout(fitCanvas, 200);
+  });
+
+  fitCanvas();
+
+  function loop() { tick(); draw(); requestAnimationFrame(loop); }
+  loop();
+})();
+</script>
+</body>
+</html>
