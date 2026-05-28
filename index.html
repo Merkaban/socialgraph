@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f7f3eb">
-<title>The shape of nearness</title>
+<title>Social Graph</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
@@ -68,7 +68,7 @@
   .topbar {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 12px;
     font-size: 13px;
     flex-wrap: wrap;
@@ -79,7 +79,7 @@
   }
   .gauge {
     flex: 1;
-    min-width: 80px;
+    min-width: 60px;
     height: 6px;
     background: rgba(0,0,0,0.06);
     border-radius: 3px;
@@ -109,7 +109,7 @@
     transition: all .25s;
     white-space: nowrap;
   }
-  .reset {
+  .ctrl-btn {
     font-size: 12px;
     padding: 6px 12px;
     border-radius: 6px;
@@ -121,11 +121,11 @@
     transition: background .2s;
     -webkit-tap-highlight-color: transparent;
   }
-  .reset:active { background: rgba(0,0,0,0.06); }
+  .ctrl-btn:active { background: rgba(0,0,0,0.06); }
 
   .canvas-wrap {
     width: 100%;
-    height: clamp(340px, 78vw, 540px);
+    height: clamp(380px, 82vw, 580px);
     border-radius: 14px;
     background: #ebe5d6;
     overflow: hidden;
@@ -142,24 +142,24 @@
 
   .legend {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     flex-wrap: wrap;
     margin-top: 14px;
-    font-size: 12px;
+    font-size: 11px;
   }
   .li {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 5px 10px;
+    gap: 5px;
+    padding: 4px 8px;
     background: #ffffff;
     border: 0.5px solid rgba(0,0,0,0.1);
     border-radius: 999px;
     color: #4a4239;
   }
   .sw {
-    width: 9px;
-    height: 9px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
   }
@@ -201,6 +201,8 @@
     main { padding: 0 18px; }
     .intro { font-size: 16px; }
     .explain p { font-size: 15px; }
+    .topbar { gap: 6px; }
+    .ctrl-btn { padding: 5px 9px; font-size: 11px; }
   }
 </style>
 </head>
@@ -208,9 +210,9 @@
 <main>
   <header>
     <p class="kicker">an interactive piece</p>
-    <h1>The shape of <em>nearness</em></h1>
-    <p class="intro">A graph normally draws people as identical dots and connections as identical lines. But real people aren't identical &mdash; and neither is what happens to you when one of them gets close.</p>
-    <p class="intro">Drag the circles. Watch what happens.</p>
+    <h1>Social <em>graph</em></h1>
+    <p class="intro">A graph normally draws people as identical dots and connections as identical lines. But real people aren't identical &mdash; and neither is what happens when one of them gets close.</p>
+    <p class="intro">Drag the circles. Or leave them alone &mdash; watch who drifts toward whom.</p>
   </header>
 
   <section class="viz" aria-label="Interactive social graph">
@@ -219,28 +221,22 @@
       <div class="gauge"><div class="gauge-fill" id="gauge"></div></div>
       <span class="val" id="energy-val">1.00</span>
       <span class="badge" id="state-badge">baseline</span>
-      <button class="reset" id="reset" type="button">Reset</button>
+      <button class="ctrl-btn" id="pause" type="button">Pause</button>
+      <button class="ctrl-btn" id="shuffle" type="button">Shuffle</button>
+      <button class="ctrl-btn" id="reset" type="button">Reset</button>
     </div>
 
     <div class="canvas-wrap">
-      <canvas id="graph" aria-label="Drag the labeled circles to see how proximity changes each person's energy and the intensity of their connections."></canvas>
+      <canvas id="graph" width="680" height="580" aria-label="Drag the labeled circles to see how proximity changes each person's energy and the intensity of their connections."></canvas>
     </div>
 
-    <div class="legend" aria-label="Legend">
-      <span class="li"><span class="sw" style="background:#7f77dd"></span>You</span>
-      <span class="li"><span class="sw" style="background:#e8973a"></span>Maya &middot; best friend</span>
-      <span class="li"><span class="sw" style="background:#378add"></span>Jordan &middot; best friend</span>
-      <span class="li"><span class="sw" style="background:#d4537e"></span>Sam &middot; partner</span>
-      <span class="li"><span class="sw" style="background:#63991f"></span>Dad &middot; family</span>
-      <span class="li"><span class="sw" style="background:#888780"></span>Riley &middot; coworker</span>
-      <span class="li"><span class="sw" style="background:#e24b4a"></span>Alex &middot; draining</span>
-    </div>
+    <div class="legend" id="legend" aria-label="Legend"></div>
   </section>
 
   <section class="explain">
-    <p>Pull Maya and Jordan close to <em>You</em> at the same time. Both bonds glow more than either alone &mdash; that's the part most graphs leave out. Being around two people you love isn't twice as good as being around one. It's <em>more</em> than twice.</p>
-    <p>Now pull Alex in. You dim. Some closeness costs you.</p>
-    <p>The patterns inside each circle are personality, fixed. The size, the brightness, the thickness of the lines &mdash; those move with the company you keep.</p>
+    <p>Pull two friends close to a third. Both bonds glow more than either alone &mdash; that's <em>synergy</em>. Being around two people you love isn't twice as good as one. It's more.</p>
+    <p>Now watch a neglected bond thin over time. Relationships fade without contact. Pull them back together and the bond heals.</p>
+    <p>Leave the graph alone and it self-organizes: clusters form around strong bonds, draining connections push people away, and weak ties stretch thin at the edges.</p>
   </section>
 
   <footer>
@@ -250,116 +246,308 @@
 
 <script>
 (function() {
-  const canvas = document.getElementById('graph');
-  const ctx = canvas.getContext('2d');
-  const gaugeEl = document.getElementById('gauge');
-  const energyValEl = document.getElementById('energy-val');
-  const badgeEl = document.getElementById('state-badge');
-  const resetBtn = document.getElementById('reset');
+  var canvas = document.getElementById('graph');
+  var ctx = canvas.getContext('2d');
+  var gaugeEl = document.getElementById('gauge');
+  var energyValEl = document.getElementById('energy-val');
+  var badgeEl = document.getElementById('state-badge');
+  var resetBtn = document.getElementById('reset');
+  var pauseBtn = document.getElementById('pause');
+  var shuffleBtn = document.getElementById('shuffle');
+  var legendEl = document.getElementById('legend');
 
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  let W = 680, H = 460;
-  let scale = 1;
+  // --- Tuning constants (edit these to adjust feel) ---
+  var DECAY_RATE = 0.003;       // per-frame decay of neglected edge strength
+  var HEAL_RATE = 0.008;        // per-frame healing when endpoints are close
+  var STRENGTH_FLOOR = 0.08;    // minimum residual for decayed positive edges
+  var NEG_DECAY_FLOOR = -0.1;   // draining edges decay toward neutral
+  var HEAL_THRESHOLD = 0.3;     // activation must exceed this to heal
+  var ATTRACT_K = 0.0004;       // attraction force multiplier
+  var REPULSE_K = 800;          // all-pairs repulsion constant
+  var NEG_REPULSE_K = 1500;     // extra repulsion for negative edges
+  var REST_DIST = 165;          // resting distance for attraction (unscaled px)
+  var DAMPING = 0.92;           // velocity damping per frame
+  var BOUNDARY_PAD = 30;        // keep nodes this far from canvas edge
+  var OPTIMAL = 165;            // distance for full activation (unscaled)
+  var FALLOFF = 230;            // falloff range beyond OPTIMAL (unscaled)
+  var SYNERGY_MULT = 0.4;       // synergy multiplier per extra active bond
+
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = 680, H = 580;
+  var scale = 1;
+  var paused = false;
 
   function fitCanvas() {
-    const rect = canvas.getBoundingClientRect();
-    W = rect.width;
-    H = rect.height;
+    var rect = canvas.getBoundingClientRect();
+    var pw = rect.width || (canvas.parentElement ? canvas.parentElement.clientWidth : 0) || window.innerWidth;
+    var ph = rect.height || (canvas.parentElement ? canvas.parentElement.clientHeight : 0) || 580;
+    W = pw;
+    H = ph;
     canvas.width = W * dpr;
     canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    scale = Math.min(W, H) / 460;
-    placeNodes();
+    scale = Math.min(W, H) / 500;
   }
 
-  const nodes = [
-    { id: 'you',    name: 'You',    baseR: 26, color: '#7f77dd', aura: '#a78bfa', texture: 'core' },
-    { id: 'maya',   name: 'Maya',   baseR: 22, color: '#e8973a', aura: '#fbbf24', texture: 'warm' },
-    { id: 'jordan', name: 'Jordan', baseR: 22, color: '#378add', aura: '#60a5fa', texture: 'cool' },
-    { id: 'sam',    name: 'Sam',    baseR: 23, color: '#d4537e', aura: '#f472b6', texture: 'soft' },
-    { id: 'dad',    name: 'Dad',    baseR: 21, color: '#63991f', aura: '#84cc16', texture: 'steady' },
-    { id: 'riley',  name: 'Riley',  baseR: 17, color: '#888780', aura: '#cbd5e1', texture: 'flat' },
-    { id: 'alex',   name: 'Alex',   baseR: 20, color: '#e24b4a', aura: '#7f1d1d', texture: 'jagged' },
+  // --- Node definitions ---
+  var nodes = [
+    { id: 'you',     name: 'You',     baseR: 24, color: '#7f77dd', aura: '#a78bfa', texture: 'core' },
+    { id: 'maya',    name: 'Maya',    baseR: 20, color: '#e8973a', aura: '#fbbf24', texture: 'warm' },
+    { id: 'jordan',  name: 'Jordan',  baseR: 20, color: '#378add', aura: '#60a5fa', texture: 'cool' },
+    { id: 'sam',     name: 'Sam',     baseR: 21, color: '#d4537e', aura: '#f472b6', texture: 'soft' },
+    { id: 'dad',     name: 'Dad',     baseR: 19, color: '#63991f', aura: '#84cc16', texture: 'steady' },
+    { id: 'mom',     name: 'Mom',     baseR: 19, color: '#2d9e6f', aura: '#6ee7b7', texture: 'steady' },
+    { id: 'riley',   name: 'Riley',   baseR: 16, color: '#888780', aura: '#cbd5e1', texture: 'flat' },
+    { id: 'alex',    name: 'Alex',    baseR: 18, color: '#e24b4a', aura: '#7f1d1d', texture: 'jagged' },
+    { id: 'casey',   name: 'Casey',   baseR: 17, color: '#6b8fa3', aura: '#94d2e8', texture: 'cool' },
+    { id: 'taylor',  name: 'Taylor',  baseR: 17, color: '#a67bc5', aura: '#d8b4fe', texture: 'soft' },
+    { id: 'devon',   name: 'Devon',   baseR: 16, color: '#c4853b', aura: '#fcd34d', texture: 'warm' },
+    { id: 'morgan',  name: 'Morgan',  baseR: 18, color: '#5c7e3e', aura: '#a3e635', texture: 'spiral' },
+    { id: 'jamie',   name: 'Jamie',   baseR: 16, color: '#cc6b5a', aura: '#fca5a5', texture: 'dotted' },
   ];
-  const byId = {};
-  nodes.forEach(n => { byId[n.id] = n; n.energy = 1; n.targetEnergy = 1; n.posActive = 0; });
 
-  function initialOffsets() {
-    return {
-      you:    [   0,    0],
-      maya:   [-200, -110],
-      jordan: [ 200, -110],
-      sam:    [   0, -175],
-      dad:    [-215,   95],
-      riley:  [ 215,   95],
-      alex:   [  35,  165],
+  var byId = {};
+  nodes.forEach(function(n) {
+    byId[n.id] = n;
+    n.energy = 1;
+    n.targetEnergy = 1;
+    n.posActive = 0;
+    n.vx = 0;
+    n.vy = 0;
+  });
+
+  // --- Edge definitions ---
+  // Edges between any pair. Strength > 0 = energizing, < 0 = draining.
+  var edges = [
+    // Your close bonds
+    { from: 'you',    to: 'maya',    strength:  1.0,  baseW: 4.5, color: '#e8973a', kind: 'best-friend' },
+    { from: 'you',    to: 'jordan',  strength:  1.0,  baseW: 4.5, color: '#378add', kind: 'best-friend' },
+    { from: 'you',    to: 'sam',     strength:  1.2,  baseW: 5,   color: '#d4537e', kind: 'partner' },
+    { from: 'you',    to: 'dad',     strength:  0.7,  baseW: 3.5, color: '#63991f', kind: 'family' },
+    { from: 'you',    to: 'mom',     strength:  0.8,  baseW: 3.5, color: '#2d9e6f', kind: 'family' },
+    { from: 'you',    to: 'riley',   strength:  0.3,  baseW: 2,   color: '#888780', kind: 'coworker' },
+    { from: 'you',    to: 'alex',    strength: -0.9,  baseW: 2.5, color: '#e24b4a', kind: 'draining', dashed: true },
+    { from: 'you',    to: 'morgan',  strength:  0.5,  baseW: 3,   color: '#5c7e3e', kind: 'friend' },
+    // Friend cluster (Maya, Jordan, Taylor)
+    { from: 'maya',   to: 'jordan',  strength:  0.7,  baseW: 3,   color: '#a78bfa', kind: 'friends' },
+    { from: 'maya',   to: 'taylor',  strength:  0.6,  baseW: 2.5, color: '#c084fc', kind: 'friends' },
+    { from: 'jordan', to: 'taylor',  strength:  0.4,  baseW: 2,   color: '#818cf8', kind: 'friends' },
+    // Family cluster (Dad, Mom)
+    { from: 'dad',    to: 'mom',     strength:  0.9,  baseW: 4,   color: '#4ade80', kind: 'family' },
+    // Work cluster (Riley, Casey, Devon)
+    { from: 'riley',  to: 'casey',   strength:  0.5,  baseW: 2.5, color: '#7ba3b5', kind: 'coworker' },
+    { from: 'riley',  to: 'devon',   strength:  0.4,  baseW: 2,   color: '#9e9083', kind: 'coworker' },
+    { from: 'casey',  to: 'devon',   strength:  0.6,  baseW: 2.5, color: '#8fa87a', kind: 'coworker' },
+    // Sam-Morgan bond (partner's friend)
+    { from: 'sam',    to: 'morgan',  strength:  0.5,  baseW: 2.5, color: '#8fb56a', kind: 'friend' },
+    // Jamie bridges (weak ties)
+    { from: 'jamie',  to: 'maya',    strength:  0.3,  baseW: 1.5, color: '#d4a087', kind: 'acquaintance' },
+    { from: 'jamie',  to: 'casey',   strength:  0.3,  baseW: 1.5, color: '#a3918a', kind: 'acquaintance' },
+    // Negative/draining peer edges
+    { from: 'alex',   to: 'riley',   strength: -0.5,  baseW: 2,   color: '#e24b4a', kind: 'draining', dashed: true },
+    { from: 'alex',   to: 'jordan',  strength: -0.4,  baseW: 1.8, color: '#e24b4a', kind: 'draining', dashed: true },
+    // Taylor-Morgan (weak acquaintance)
+    { from: 'taylor', to: 'morgan',  strength:  0.2,  baseW: 1.5, color: '#8e9e7a', kind: 'acquaintance' },
+  ];
+
+  // Initialize mutable currentStrength
+  edges.forEach(function(e) {
+    e.currentStrength = e.strength;
+    e.activation = 0;
+    e.synergyBoost = 0;
+  });
+
+  // --- Layout ---
+  function initialPositions() {
+    var cx = W / 2, cy = H / 2;
+    var r1 = Math.min(W, H) * 0.25;
+    var r2 = Math.min(W, H) * 0.4;
+    var placements = {
+      you:    [cx, cy],
+      sam:    [cx + r1 * 0.1, cy - r1 * 0.95],
+      maya:   [cx - r1 * 0.9, cy - r1 * 0.5],
+      jordan: [cx + r1 * 0.9, cy - r1 * 0.4],
+      dad:    [cx - r2 * 0.7, cy + r2 * 0.4],
+      mom:    [cx - r2 * 0.5, cy + r2 * 0.65],
+      riley:  [cx + r2 * 0.65, cy + r2 * 0.35],
+      casey:  [cx + r2 * 0.85, cy + r2 * 0.6],
+      devon:  [cx + r2 * 0.55, cy + r2 * 0.75],
+      alex:   [cx + r2 * 0.15, cy + r2 * 0.85],
+      taylor: [cx - r1 * 0.3, cy - r2 * 0.7],
+      morgan: [cx - r2 * 0.1, cy - r2 * 0.55],
+      jamie:  [cx - r2 * 0.85, cy - r2 * 0.15],
     };
-  }
-
-  function placeNodes() {
-    const cx = W / 2, cy = H / 2;
-    const offsets = initialOffsets();
-    nodes.forEach(n => {
-      const [ox, oy] = offsets[n.id];
-      n.x = cx + ox * scale;
-      n.y = cy + oy * scale;
+    nodes.forEach(function(n) {
+      var p = placements[n.id];
+      if (p) { n.x = p[0]; n.y = p[1]; }
+      else { n.x = cx + (Math.random() - 0.5) * r2; n.y = cy + (Math.random() - 0.5) * r2; }
+      n.vx = 0;
+      n.vy = 0;
     });
   }
 
-  const edges = [
-    { from: 'you', to: 'maya',    strength:  1.0, baseW: 5,   color: '#e8973a', kind: 'best-friend' },
-    { from: 'you', to: 'jordan',  strength:  1.0, baseW: 5,   color: '#378add', kind: 'best-friend' },
-    { from: 'you', to: 'sam',     strength:  1.2, baseW: 6,   color: '#d4537e', kind: 'partner' },
-    { from: 'you', to: 'dad',     strength:  0.7, baseW: 4,   color: '#63991f', kind: 'family' },
-    { from: 'you', to: 'riley',   strength:  0.3, baseW: 2,   color: '#888780', kind: 'coworker' },
-    { from: 'you', to: 'alex',    strength: -0.9, baseW: 3,   color: '#e24b4a', kind: 'draining', dashed: true },
-    { from: 'maya', to: 'jordan', strength:  0.4, baseW: 2,   color: '#a78bfa', kind: 'friends' },
-  ];
+  function resetAll() {
+    initialPositions();
+    edges.forEach(function(e) { e.currentStrength = e.strength; });
+    nodes.forEach(function(n) { n.energy = 1; n.targetEnergy = 1; });
+  }
 
+  function shuffleNodes() {
+    var pad = 60;
+    nodes.forEach(function(n) {
+      n.x = pad + Math.random() * (W - pad * 2);
+      n.y = pad + Math.random() * (H - pad * 2);
+      n.vx = 0;
+      n.vy = 0;
+    });
+  }
+
+  // --- Physics ---
   function tick() {
-    const OPTIMAL = 165 * scale;
-    const FALLOFF = 230 * scale;
+    var optDist = OPTIMAL * scale;
+    var fallDist = FALLOFF * scale;
+    var restDist = REST_DIST * scale;
 
-    for (const e of edges) {
-      const a = byId[e.from], b = byId[e.to];
-      const dx = a.x - b.x, dy = a.y - b.y;
-      const d = Math.sqrt(dx*dx + dy*dy);
-      const excess = Math.max(0, d - OPTIMAL);
-      e.activation = Math.max(0, 1 - excess / FALLOFF);
+    // Edge activation and decay/healing
+    for (var ei = 0; ei < edges.length; ei++) {
+      var e = edges[ei];
+      var a = byId[e.from], b = byId[e.to];
+      var dx = a.x - b.x, dy = a.y - b.y;
+      var d = Math.sqrt(dx * dx + dy * dy);
+      var excess = Math.max(0, d - optDist);
+      e.activation = Math.max(0, 1 - excess / fallDist);
+
+      if (!paused) {
+        // Decay/heal currentStrength
+        if (e.strength > 0) {
+          if (e.activation > HEAL_THRESHOLD) {
+            e.currentStrength += (e.strength - e.currentStrength) * HEAL_RATE;
+          } else {
+            e.currentStrength += (STRENGTH_FLOOR - e.currentStrength) * DECAY_RATE;
+          }
+          e.currentStrength = Math.max(STRENGTH_FLOOR, Math.min(e.strength, e.currentStrength));
+        } else {
+          // Negative edge: decays toward neutral (less draining) when apart
+          if (e.activation > HEAL_THRESHOLD) {
+            e.currentStrength += (e.strength - e.currentStrength) * HEAL_RATE;
+          } else {
+            e.currentStrength += (NEG_DECAY_FLOOR - e.currentStrength) * DECAY_RATE;
+          }
+          e.currentStrength = Math.min(NEG_DECAY_FLOOR, Math.max(e.strength, e.currentStrength));
+        }
+      }
     }
 
-    for (const n of nodes) {
-      let pos = 0, neg = 0, posActive = 0;
-      for (const e of edges) {
-        if (e.from !== n.id && e.to !== n.id) continue;
-        const c = e.activation * e.strength;
-        if (e.strength > 0) { pos += c; if (e.activation > 0.4) posActive++; }
-        else neg += c;
+    // Energy computation (symmetric for all nodes)
+    for (var ni = 0; ni < nodes.length; ni++) {
+      var n = nodes[ni];
+      var pos = 0, neg = 0, posActive = 0;
+      for (var ei2 = 0; ei2 < edges.length; ei2++) {
+        var e2 = edges[ei2];
+        if (e2.from !== n.id && e2.to !== n.id) continue;
+        var c = e2.activation * e2.currentStrength;
+        if (e2.currentStrength > 0) {
+          pos += c;
+          if (e2.activation > 0.4) posActive++;
+        } else {
+          neg += c;
+        }
       }
-      if (posActive >= 2) pos *= 1 + 0.4 * (posActive - 1);
+      if (posActive >= 2) pos *= 1 + SYNERGY_MULT * (posActive - 1);
       n.posActive = posActive;
       n.targetEnergy = Math.max(0.45, Math.min(2.3, 1 + pos * 0.55 + neg * 0.7));
       n.energy += (n.targetEnergy - n.energy) * 0.13;
     }
 
-    const you = byId.you;
-    for (const e of edges) {
-      e.synergyBoost = 0;
-      if ((e.from === 'you' || e.to === 'you') && e.strength > 0 && you.posActive >= 2 && e.activation > 0.4) {
-        e.synergyBoost = 0.35 * (you.posActive - 1);
+    // Synergy boost per edge (for rendering glow)
+    for (var ei3 = 0; ei3 < edges.length; ei3++) {
+      var e3 = edges[ei3];
+      e3.synergyBoost = 0;
+      if (e3.currentStrength > 0 && e3.activation > 0.4) {
+        var nFrom = byId[e3.from], nTo = byId[e3.to];
+        var maxActive = Math.max(nFrom.posActive, nTo.posActive);
+        if (maxActive >= 2) {
+          e3.synergyBoost = 0.3 * (maxActive - 1);
+        }
       }
+    }
+
+    // Force-directed drift (skip if paused)
+    if (paused) return;
+
+    // Reset forces
+    for (var fi = 0; fi < nodes.length; fi++) {
+      nodes[fi].fx = 0;
+      nodes[fi].fy = 0;
+    }
+
+    // Edge-based attraction/repulsion
+    for (var ei4 = 0; ei4 < edges.length; ei4++) {
+      var e4 = edges[ei4];
+      var na = byId[e4.from], nb = byId[e4.to];
+      var ddx = nb.x - na.x, ddy = nb.y - na.y;
+      var dist = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
+      var ux = ddx / dist, uy = ddy / dist;
+
+      if (e4.currentStrength > 0) {
+        // Attract toward restDist
+        var delta = dist - restDist;
+        var force = delta * ATTRACT_K * e4.currentStrength;
+        na.fx += ux * force;
+        na.fy += uy * force;
+        nb.fx -= ux * force;
+        nb.fy -= uy * force;
+      } else {
+        // Repulse
+        var repF = NEG_REPULSE_K * Math.abs(e4.currentStrength) / (dist * dist + 100);
+        na.fx -= ux * repF;
+        na.fy -= uy * repF;
+        nb.fx += ux * repF;
+        nb.fy += uy * repF;
+      }
+    }
+
+    // All-pairs repulsion (O(n^2), fine for n~13)
+    for (var i = 0; i < nodes.length; i++) {
+      for (var j = i + 1; j < nodes.length; j++) {
+        var ni2 = nodes[i], nj = nodes[j];
+        var rdx = nj.x - ni2.x, rdy = nj.y - ni2.y;
+        var rd = Math.sqrt(rdx * rdx + rdy * rdy) || 1;
+        var rux = rdx / rd, ruy = rdy / rd;
+        var rep = REPULSE_K / (rd * rd + 200);
+        ni2.fx -= rux * rep;
+        ni2.fy -= ruy * rep;
+        nj.fx += rux * rep;
+        nj.fy += ruy * rep;
+      }
+    }
+
+    // Apply forces (skip dragged node)
+    for (var ai = 0; ai < nodes.length; ai++) {
+      var nd = nodes[ai];
+      if (nd === dragNode) continue;
+      nd.vx = (nd.vx + nd.fx) * DAMPING;
+      nd.vy = (nd.vy + nd.fy) * DAMPING;
+      nd.x += nd.vx;
+      nd.y += nd.vy;
+      // Boundary containment
+      if (nd.x < BOUNDARY_PAD) { nd.x = BOUNDARY_PAD; nd.vx *= -0.5; }
+      if (nd.x > W - BOUNDARY_PAD) { nd.x = W - BOUNDARY_PAD; nd.vx *= -0.5; }
+      if (nd.y < BOUNDARY_PAD) { nd.y = BOUNDARY_PAD; nd.vy *= -0.5; }
+      if (nd.y > H - BOUNDARY_PAD) { nd.y = H - BOUNDARY_PAD; nd.vy *= -0.5; }
     }
   }
 
+  // --- Rendering ---
   function hexA(hex, alpha) {
     return hex + Math.floor(Math.min(1, Math.max(0, alpha)) * 255).toString(16).padStart(2, '0');
   }
 
   function drawTexture(n, r) {
-    const { x, y, texture } = n;
+    var x = n.x, y = n.y, texture = n.texture;
     ctx.save();
     if (texture === 'core') {
-      const grd = ctx.createRadialGradient(x - r*0.3, y - r*0.3, r*0.05, x, y, r);
+      var grd = ctx.createRadialGradient(x - r*0.3, y - r*0.3, r*0.05, x, y, r);
       grd.addColorStop(0, 'rgba(255,255,255,0.55)');
       grd.addColorStop(0.6, 'rgba(255,255,255,0)');
       ctx.fillStyle = grd;
@@ -367,8 +555,8 @@
     } else if (texture === 'warm') {
       ctx.strokeStyle = 'rgba(255,255,255,0.45)';
       ctx.lineWidth = 1.2;
-      for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
+      for (var i = 0; i < 8; i++) {
+        var a = (i / 8) * Math.PI * 2;
         ctx.beginPath();
         ctx.moveTo(x + Math.cos(a) * r * 0.32, y + Math.sin(a) * r * 0.32);
         ctx.lineTo(x + Math.cos(a) * r * 0.75, y + Math.sin(a) * r * 0.75);
@@ -381,19 +569,19 @@
       ctx.beginPath(); ctx.arc(x, y, r * 0.72, 0, Math.PI*2); ctx.stroke();
     } else if (texture === 'soft') {
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2 - Math.PI/2;
+      for (var i2 = 0; i2 < 6; i2++) {
+        var a2 = (i2 / 6) * Math.PI * 2 - Math.PI/2;
         ctx.beginPath();
-        ctx.arc(x + Math.cos(a) * r * 0.5, y + Math.sin(a) * r * 0.5, 1.8, 0, Math.PI*2);
+        ctx.arc(x + Math.cos(a2) * r * 0.5, y + Math.sin(a2) * r * 0.5, 1.8, 0, Math.PI*2);
         ctx.fill();
       }
       ctx.beginPath(); ctx.arc(x, y, 1.8, 0, Math.PI*2); ctx.fill();
     } else if (texture === 'steady') {
       ctx.strokeStyle = 'rgba(255,255,255,0.4)';
       ctx.lineWidth = 1.1;
-      for (let i = -2; i <= 2; i++) {
-        const yy = y + i * r * 0.28;
-        const half = Math.sqrt(Math.max(0, r*r - (i*r*0.28)*(i*r*0.28))) * 0.82;
+      for (var i3 = -2; i3 <= 2; i3++) {
+        var yy = y + i3 * r * 0.28;
+        var half = Math.sqrt(Math.max(0, r*r - (i3*r*0.28)*(i3*r*0.28))) * 0.82;
         if (half > 2) { ctx.beginPath(); ctx.moveTo(x - half, yy); ctx.lineTo(x + half, yy); ctx.stroke(); }
       }
     } else if (texture === 'flat') {
@@ -401,41 +589,65 @@
     } else if (texture === 'jagged') {
       ctx.strokeStyle = 'rgba(0,0,0,0.4)';
       ctx.lineWidth = 1.6;
-      const j = r * 0.55;
+      var j = r * 0.55;
       ctx.beginPath();
       ctx.moveTo(x-j, y-j*0.6); ctx.lineTo(x-j*0.1, y+j*0.3); ctx.lineTo(x+j*0.6, y-j*0.4); ctx.lineTo(x+j, y+j*0.6);
       ctx.stroke();
+    } else if (texture === 'spiral') {
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      for (var s = 0; s < 20; s++) {
+        var ang = s * 0.4;
+        var sr = r * 0.15 + s * r * 0.035;
+        var sx = x + Math.cos(ang) * sr;
+        var sy = y + Math.sin(ang) * sr;
+        if (s === 0) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+      }
+      ctx.stroke();
+    } else if (texture === 'dotted') {
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      for (var d = 0; d < 5; d++) {
+        var da = (d / 5) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(x + Math.cos(da) * r * 0.55, y + Math.sin(da) * r * 0.55, 2, 0, Math.PI*2);
+        ctx.fill();
+      }
     }
     ctx.restore();
   }
 
-  let t = 0;
+  var t = 0;
   function draw() {
     t += 1/60;
     ctx.clearRect(0, 0, W, H);
 
     // Edges
-    for (const e of edges) {
-      const a = byId[e.from], b = byId[e.to];
-      const act = e.activation;
-      const isNeg = e.strength < 0;
-      const syn = e.synergyBoost || 0;
-      const bw = e.baseW * Math.max(0.85, scale * 0.9);
+    for (var ei = 0; ei < edges.length; ei++) {
+      var e = edges[ei];
+      var a = byId[e.from], b = byId[e.to];
+      var act = e.activation;
+      var cs = Math.abs(e.currentStrength);
+      var isNeg = e.currentStrength < 0;
+      var syn = e.synergyBoost || 0;
+      var strengthRatio = e.strength !== 0 ? cs / Math.abs(e.strength) : 1;
+      var bw = e.baseW * Math.max(0.85, scale * 0.9) * strengthRatio;
 
-      if (!isNeg && act > 0.1) {
-        const haloAlpha = act * (0.18 + syn * 0.35);
+      if (!isNeg && act > 0.1 && cs > 0.15) {
+        var haloAlpha = act * (0.15 + syn * 0.3) * strengthRatio;
         ctx.strokeStyle = hexA(e.color, haloAlpha);
         ctx.lineWidth = bw * (1 + act * 2 + syn * 1.5) * 2.6;
         ctx.lineCap = 'round';
         ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
       }
 
-      const mainAlpha = isNeg ? 0.5 + act * 0.4 : 0.32 + act * 0.55 + syn * 0.15;
+      var mainAlpha = isNeg ? (0.4 + act * 0.4) * strengthRatio : (0.25 + act * 0.5 + syn * 0.12) * strengthRatio;
+      if (cs < 0.15) mainAlpha *= cs / 0.15;
       ctx.strokeStyle = hexA(e.color, Math.min(1, mainAlpha));
-      ctx.lineWidth = bw * (0.55 + act * 1.4 + syn * 1.2);
+      ctx.lineWidth = bw * (0.5 + act * 1.3 + syn * 1.0);
       ctx.lineCap = 'round';
       if (e.dashed) {
-        const dashPhase = (t * 14) % 11;
+        var dashPhase = (t * 14) % 11;
         ctx.setLineDash([6, 5]);
         ctx.lineDashOffset = -dashPhase;
       }
@@ -445,15 +657,16 @@
     }
 
     // Nodes
-    for (const n of nodes) {
-      const r = n.baseR * scale * (0.7 + n.energy * 0.42);
+    for (var ni = 0; ni < nodes.length; ni++) {
+      var n = nodes[ni];
+      var r = n.baseR * scale * (0.7 + n.energy * 0.42);
 
-      const auraStrength = Math.max(0, n.energy - 0.85);
+      var auraStrength = Math.max(0, n.energy - 0.85);
       if (auraStrength > 0.02) {
-        const pulse = n.posActive >= 2 ? (1 + Math.sin(t * 3.5) * 0.06) : 1;
-        const auraR = r * (1.8 + auraStrength * 2.4) * pulse;
-        const auraAlpha = Math.min(0.55, auraStrength * 0.7);
-        const grd = ctx.createRadialGradient(n.x, n.y, r * 0.7, n.x, n.y, auraR);
+        var pulse = n.posActive >= 2 ? (1 + Math.sin(t * 3.5) * 0.06) : 1;
+        var auraR = r * (1.8 + auraStrength * 2.4) * pulse;
+        var auraAlpha = Math.min(0.55, auraStrength * 0.7);
+        var grd = ctx.createRadialGradient(n.x, n.y, r * 0.7, n.x, n.y, auraR);
         grd.addColorStop(0, hexA(n.aura, auraAlpha));
         grd.addColorStop(0.5, hexA(n.aura, auraAlpha * 0.35));
         grd.addColorStop(1, hexA(n.aura, 0));
@@ -462,16 +675,16 @@
       }
 
       if (n.energy < 0.9) {
-        const dimR = r * 1.6;
-        const grd = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, dimR);
-        const dimA = (0.9 - n.energy) * 0.4;
-        grd.addColorStop(0, hexA('#1a1a1a', dimA));
-        grd.addColorStop(1, hexA('#1a1a1a', 0));
-        ctx.fillStyle = grd;
+        var dimR = r * 1.6;
+        var grd2 = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, dimR);
+        var dimA = (0.9 - n.energy) * 0.4;
+        grd2.addColorStop(0, hexA('#1a1a1a', dimA));
+        grd2.addColorStop(1, hexA('#1a1a1a', 0));
+        ctx.fillStyle = grd2;
         ctx.beginPath(); ctx.arc(n.x, n.y, dimR, 0, Math.PI*2); ctx.fill();
       }
 
-      const opacity = 0.55 + Math.min(0.45, Math.max(0, (n.energy - 0.55) * 0.55));
+      var opacity = 0.55 + Math.min(0.45, Math.max(0, (n.energy - 0.55) * 0.55));
       ctx.fillStyle = hexA(n.color, opacity);
       ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2); ctx.fill();
 
@@ -482,14 +695,15 @@
       ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2); ctx.stroke();
 
       ctx.fillStyle = 'rgba(26,22,18,0.85)';
-      ctx.font = '500 ' + Math.max(11, Math.round(12 * scale)) + 'px -apple-system, system-ui, sans-serif';
+      ctx.font = '500 ' + Math.max(10, Math.round(11 * scale)) + 'px -apple-system, system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillText(n.name, n.x, n.y + r + 6);
+      ctx.fillText(n.name, n.x, n.y + r + 5);
     }
 
-    const you = byId.you;
-    const pct = Math.min(100, Math.max(0, (you.energy - 0.4) / 1.8 * 100));
+    // UI gauge (tracks "You" node)
+    var you = byId.you;
+    var pct = Math.min(100, Math.max(0, (you.energy - 0.4) / 1.8 * 100));
     gaugeEl.style.width = pct + '%';
     energyValEl.textContent = you.energy.toFixed(2);
 
@@ -516,53 +730,99 @@
     }
   }
 
-  let dragNode = null;
+  // --- Interaction ---
+  var dragNode = null;
   function nodeAt(x, y) {
-    for (let i = nodes.length - 1; i >= 0; i--) {
-      const n = nodes[i];
-      const r = n.baseR * scale * (0.7 + n.energy * 0.42);
-      const hit = Math.max(r + 12, 22); // generous hit area for fingers
-      const dx = n.x - x, dy = n.y - y;
+    for (var i = nodes.length - 1; i >= 0; i--) {
+      var n = nodes[i];
+      var r = n.baseR * scale * (0.7 + n.energy * 0.42);
+      var hit = Math.max(r + 14, 24);
+      var dx = n.x - x, dy = n.y - y;
       if (dx*dx + dy*dy <= hit * hit) return n;
     }
     return null;
   }
   function getXY(e) {
-    const rect = canvas.getBoundingClientRect();
+    var rect = canvas.getBoundingClientRect();
     return { x: e.clientX - rect.left, y: e.clientY - rect.top };
   }
-  canvas.addEventListener('pointerdown', (e) => {
-    const { x, y } = getXY(e);
-    dragNode = nodeAt(x, y);
+  canvas.addEventListener('pointerdown', function(e) {
+    var pt = getXY(e);
+    dragNode = nodeAt(pt.x, pt.y);
     if (dragNode) {
+      dragNode.vx = 0;
+      dragNode.vy = 0;
       canvas.setPointerCapture(e.pointerId);
       e.preventDefault();
     }
   });
-  canvas.addEventListener('pointermove', (e) => {
+  canvas.addEventListener('pointermove', function(e) {
     if (!dragNode) return;
-    const { x, y } = getXY(e);
-    dragNode.x = Math.max(20, Math.min(W - 20, x));
-    dragNode.y = Math.max(20, Math.min(H - 20, y));
+    var pt = getXY(e);
+    dragNode.x = Math.max(20, Math.min(W - 20, pt.x));
+    dragNode.y = Math.max(20, Math.min(H - 20, pt.y));
   });
-  canvas.addEventListener('pointerup', () => { dragNode = null; });
-  canvas.addEventListener('pointercancel', () => { dragNode = null; });
+  canvas.addEventListener('pointerup', function() {
+    if (dragNode) { dragNode.vx = 0; dragNode.vy = 0; }
+    dragNode = null;
+  });
+  canvas.addEventListener('pointercancel', function() {
+    if (dragNode) { dragNode.vx = 0; dragNode.vy = 0; }
+    dragNode = null;
+  });
 
-  resetBtn.addEventListener('click', () => { placeNodes(); });
+  // --- Controls ---
+  resetBtn.addEventListener('click', function() { resetAll(); });
+  pauseBtn.addEventListener('click', function() {
+    paused = !paused;
+    pauseBtn.textContent = paused ? 'Play' : 'Pause';
+  });
+  shuffleBtn.addEventListener('click', function() { shuffleNodes(); });
 
-  let resizeTimeout;
-  window.addEventListener('resize', () => {
+  // --- Legend ---
+  (function buildLegend() {
+    var html = '';
+    nodes.forEach(function(n) {
+      var label = n.name;
+      html += '<span class="li"><span class="sw" style="background:' + n.color + '"></span>' + label + '</span>';
+    });
+    legendEl.innerHTML = html;
+  })();
+
+  // --- Init ---
+  var resizeTimeout;
+  window.addEventListener('resize', function() {
     clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(fitCanvas, 100);
+    resizeTimeout = setTimeout(function() { fitCanvas(); }, 100);
   });
-  window.addEventListener('orientationchange', () => {
+  window.addEventListener('orientationchange', function() {
     setTimeout(fitCanvas, 200);
   });
 
-  fitCanvas();
+  // iOS Safari canvas init: wait for DOM, then double-rAF, re-fit on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initCanvas);
+  } else {
+    initCanvas();
+  }
+
+  function initCanvas() {
+    fitCanvas();
+    initialPositions();
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        fitCanvas();
+        initialPositions();
+        loop();
+      });
+    });
+  }
+
+  window.addEventListener('load', function() {
+    fitCanvas();
+  });
 
   function loop() { tick(); draw(); requestAnimationFrame(loop); }
-  loop();
 })();
 </script>
 </body>
